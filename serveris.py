@@ -59,35 +59,45 @@ def viela_id(vielasID):
 
 @app.route('/api/v1/viela', methods=['POST'])
 def pievienot_vielu():
-    with open("dati/vielas.json", "r", encoding="utf-8") as f:
-    vielas = json.loads
-    dati = json.loads(request.data)
-    print(dati)
-    return "1"
+  datne = "dati/vielas.json"
+  with open(datne, "r", encoding="utf-8") as f:
+    vielas = json.loads(f.read())
+
+  last_id = vielas[len(vielas) - 1]['id']
+
+  jauna_viela = json.loads(request.data)
+  jauna_viela['id'] = last_id + 1
+
+  vielas.append(jauna_viela)
+
+  with open(datne, "w", encoding="utf-8") as f:
+    f.write(json.dumps(vielas))
+
+  return "1"
 
 
 @app.route('/api/v1/<kategorija>/<id>/dzest', methods=['POST'])
 def dzest(kategorija, id):
-    if kategorija == "vielas":
-        datne = "dati/vielas.json"
-    elif kategorija == "inventars":
-        datne = "dati/inventars.json"
-    else:
-        return "0"
+  if kategorija == "vielas":
+    datne = "dati/vielas.json"
+  elif kategorija == "inventars":
+    datne = "dati/inventars.json"
+  else:
+    return "0"
 
 
-with open(datne, "r", encoding='utf-8') as f:
+  with open(datne, "r", encoding='utf-8') as f:
     dati = json.loads(f.read())
 
-new_data = []
-for v in dati:
+  new_data = []
+  for v in dati:
     if str(v['id']) != id:
-        new_data.append(v)
+      new_data.append(v)
 
-with open(datne, "w", encoding="utf-8") as f:
+  with open(datne, "w", encoding="utf-8") as f:
     f.write(json.dumps(new_data))
 
-return "1"
+  return "1"
 
 if __name__ == "__main__":
     app.run("0.0.0.0", debug=True)
